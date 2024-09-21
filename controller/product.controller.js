@@ -66,4 +66,30 @@ const remove = async (req, res) => {
     }
 }
 
-module.exports = { getAll, getByName, add, remove }
+const update = async (req, res) => {
+    try {
+        const product = req.body;
+
+        const validationResult = validateProduct(product);
+
+        if (!validationResult) 
+            return res.status(400).json(validationResult.errors);
+
+        const exists = await Product.findOne( {name: req.body.name } );
+
+        if (!exists)
+            return res.status(404).json({ message: 'Product does not exist' });
+
+        const filter = { name: exists.name };
+        const update = { quantity: product.quantity, price: product.price, image: product.image };
+
+        const result = await Product.findOneAndUpdate( filter, update );
+
+        return res.status(200).json(result);
+    }
+    catch (error) {
+
+    }
+}
+
+module.exports = { getAll, getByName, add, remove, update }
